@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"image/color"
 	"log"
-	"slices"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -14,6 +13,7 @@ import (
 
 type ScreenText struct {
 	Text         string
+	ArrayText    []string
 	TextLength   int
 	booted       bool
 	visibleLines int
@@ -22,19 +22,24 @@ type ScreenText struct {
 func NewScreenText() *ScreenText {
 	return &ScreenText{
 		Text:         context.BootText,
+		ArrayText:    strings.Split(context.BootText, "\n"),
 		TextLength:   len(context.BootText),
 		booted:       false,
 		visibleLines: 0,
 	}
 }
+func (st *ScreenText) RecomputeArray() {
+	st.ArrayText = strings.Split(st.Text, "\n")
+}
 
 func (st *ScreenText) Update(ticks int) {
+	splittedText := strings.Split(context.BootText, "\n")
 	if ticks%1 == 0 {
-		if st.visibleLines < len(strings.Split(context.BootText, "\n")) {
+		if st.visibleLines < len(splittedText) {
 			st.visibleLines++
 		}
 	}
-	if st.visibleLines == len(strings.Split(context.BootText, "\n")) {
+	if st.visibleLines == len(splittedText) {
 		st.booted = true
 		st.visibleLines = 41
 	}
@@ -54,6 +59,7 @@ func (st *ScreenText) Update(ticks int) {
 				st.TextLength++
 			}
 
+			st.RecomputeArray()
 		}
 
 	}
@@ -74,14 +80,13 @@ func (st *ScreenText) Draw(screen *ebiten.Image) {
 			Size:   24,
 		}, op)
 	}
-
 }
 
 func (st *ScreenText) AddChar(c string) {
 	lastchar := st.Text[len(st.Text)-1]
 	textLength := len(st.Text)
 
-	lines := strings.Split(st.Text, "\n")
+	lines := st.ArrayText
 	newLine := ""
 	if len(lines[len(lines)-1]) > 100 {
 		newLine = "\n"
@@ -96,13 +101,14 @@ func (st *ScreenText) AddChar(c string) {
 	if newLine == "\n" {
 		fmt.Println(st.Text)
 	}
+	st.RecomputeArray()
 }
 
 func (st *ScreenText) DeleteChar() {
 	lastchar := st.Text[len(st.Text)-1]
 	textLength := len(st.Text)
 
-	lines := strings.Split(st.Text, "\n")
+	lines := st.ArrayText
 	lastLine := lines[len(lines)-1]
 	if string(lastLine[len(lastLine)-1]) == context.CURSOR {
 		lastLine = lastLine[0 : len(lastLine)-1]
@@ -117,11 +123,12 @@ func (st *ScreenText) DeleteChar() {
 	} else {
 		st.Text = st.Text[0 : textLength-1]
 	}
+	st.RecomputeArray()
 }
 
 func (st *ScreenText) Execute() {
 
-	lines := strings.Split(st.Text, "\n")
+	lines := st.ArrayText
 	lastLine := lines[len(lines)-1]
 	lastchar := lastLine[len(lastLine)-1]
 
@@ -136,6 +143,8 @@ func (st *ScreenText) Execute() {
 	st.Text = nt + "\n" + context.PROMPT + context.CURSOR
 	st.cleanUp()
 	// st.visibleLines++
+
+	st.RecomputeArray()
 }
 func (st *ScreenText) cleanUp() {
 	lines := strings.Split(st.Text, "\n")
@@ -144,6 +153,7 @@ func (st *ScreenText) cleanUp() {
 	}
 
 	st.Text = strings.Join(lines[len(lines)-40:len(lines)], "\n")
+	st.RecomputeArray()
 
 }
 
@@ -152,21 +162,32 @@ func commandsGateway(st *ScreenText, cmd string, lines []string) string {
 	if len(cmd) > 2 && cmd[0:3] == "cd " {
 		newdir := cmd[3:]
 		fmt.Println(newdir, len(newdir), newdir == "..")
-		if newdir == ".." || newdir == "../" {
 
-			context.Wd.Path = "~"
-			context.Wd.Parent = "~"
-			context.UpdateDir(context.Wd.Path)
-			return st.Text
-
+		var errs string
+		newHead, errs := context.Head.Cd(newdir)
+		if errs != "" {
+			fmt.Println(errs)
+		} else {
+			context.Head = newHead
+			context.UpdateDir(context.Pwd(context.Head))
 		}
-		if !slices.Contains(context.VisibleDirs[context.Wd.Path], newdir) {
-			return st.Text + "\n" + "cd: no such file or directory: " + newdir
-		}
-		context.Wd.Parent = context.Wd.Path
-		context.Wd.Path += "/" + newdir
 
-		context.UpdateDir(context.Wd.Path)
+		// if newdir == ".." || newdir == "../" {
+		//
+		// 	context.Wd.Path = "~"
+		// 	context.Wd.Parent = "~"
+
+		//
+		// 	return st.Text
+		//
+		// }
+		// if !slices.Contains(context.VisibleDirs[context.Wd.Path], newdir) {
+		// 	return st.Text + "\n" + "cd: no such file or directory: " + newdir
+		// }
+		// context.Wd.Parent = context.Wd.Path
+		// context.Wd.Path += "/" + newdir
+		//
+		// context.UpdateDir(context.Wd.Path)
 		return st.Text
 	}
 
@@ -175,19 +196,21 @@ func commandsGateway(st *ScreenText, cmd string, lines []string) string {
 	}
 
 	if cmd == "ls" {
-		vf := context.VisibleFiles[context.Wd.Path]
-		vd := context.VisibleDirs[context.Wd.Path]
-		combined := ""
-		for _, val := range vd {
-			combined += "drwxr-xr-x     - oussama_ben_hassen   " + val + "\n"
-		}
-		for _, val := range vf {
-			combined += "-r--r--r--		  - oussama_ben_hassen   " + val + "\n"
-		}
-		return st.Text + "\n" + combined
+		return st.Text + "\n" + strings.Join(context.Head.Ls(), "\n")
+		// vf := context.VisibleFiles[context.Wd.Path]
+		// vd := context.VisibleDirs[context.Wd.Path]
+		// combined := ""
+		// for _, val := range vd {
+		// 	combined += "drwxr-xr-x     - oussama_ben_hassen   " + val + "\n"
+		// }
+		// for _, val := range vf {
+		// 	combined += "-r--r--r--		  - oussama_ben_hassen   " + val + "\n"
+		// }
+		// return st.Text + "\n" + combined
 	}
 	if cmd == "pwd" {
-		return st.Text + "\n" + context.Wd.Path
+		return st.Text + "\n" + context.Pwd(context.Head)
+		// return st.Text + "\n" + context.Wd.Path
 	}
 
 	if cmd == "neofetch" {

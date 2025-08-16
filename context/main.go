@@ -24,8 +24,14 @@ var Wd = WorkDir{
 }
 
 func UpdateDir(path string) {
+	// PROMPT = fmt.Sprintf("%s%s $ ", BASE_PROMPT, path)
+
 	PROMPT = fmt.Sprintf("%s%s $ ", BASE_PROMPT, path)
 }
+
+// func UpdateHead(node *Node) {
+//
+// }
 
 const CURSOR = "_"
 
@@ -57,6 +63,8 @@ Arch Linux  (tty1)
 ` + PROMPT
 
 const Line_Y_OFFSET float64 = 25
+
+var Head *Node = MakeFileTree()
 
 const MAX_LINES = 35
 
@@ -123,6 +131,14 @@ var KeyToChar = map[ebiten.Key]string{
 }
 
 func init() {
+
+	Head.MakeNode("CV", Dir)
+	Blog := Head.MakeNode("Blog", Dir)
+	Head.MakeNode("contact.md", File)
+	Blog.MakeNode("first.md", File)
+	Blog.MakeNode("second.md", File)
+	Blog.MakeNode("Some", Dir)
+
 	s, err := text.NewGoTextFaceSource(bytes.NewReader(static.IosevkaTTF))
 	if err != nil {
 		log.Fatal(err)
