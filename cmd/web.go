@@ -1,16 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
 	// Serve static files
-	str, _ := os.Getwd()
-	fmt.Println(str)
 	fs := http.FileServer(http.Dir("./web"))
 
 	// Redirect / to /main.html

@@ -1,7 +1,6 @@
 package bits
 
 import (
-	"fmt"
 	"github.com/Oussamabh242/os-profile/context"
 	"image/color"
 	"log"
@@ -90,7 +89,6 @@ func (st *ScreenText) AddChar(c string) {
 	newLine := ""
 	if len(lines[len(lines)-1]) > 100 {
 		newLine = "\n"
-		fmt.Println("yes")
 	}
 
 	if string(lastchar) == context.CURSOR {
@@ -99,7 +97,6 @@ func (st *ScreenText) AddChar(c string) {
 		st.Text = st.Text + newLine + c
 	}
 	if newLine == "\n" {
-		fmt.Println(st.Text)
 	}
 	st.RecomputeArray()
 }
@@ -161,12 +158,10 @@ func commandsGateway(st *ScreenText, cmd string, lines []string) string {
 
 	if len(cmd) > 2 && cmd[0:3] == "cd " {
 		newdir := cmd[3:]
-		fmt.Println(newdir, len(newdir), newdir == "..")
 
 		var errs string
 		newHead, errs := context.Head.Cd(newdir)
 		if errs != "" {
-			fmt.Println(errs)
 		} else {
 			context.Head = newHead
 			context.UpdateDir(context.Pwd(context.Head))

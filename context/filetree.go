@@ -1,7 +1,5 @@
 package context
 
-import "fmt"
-
 type Filetype int
 
 const (
@@ -71,16 +69,12 @@ func (n *Node) Ls() []string {
 }
 
 func (n *Node) Cd(dir string) (*Node, string) {
-	fmt.Println("inside CD-FUNC : " + dir)
 	if dir == ".." && n.IsRoot == false && n.Parent != nil {
 		return n.Parent, ""
 	}
 
-	fmt.Println("inside CD-FUNC : " + dir)
-
 	for _, node := range n.Children {
 		//-r--r--r--     - oussama_ben_hassen  4 Apr 12:09
-		fmt.Println("inside CD-FUNC : ", node.Name)
 
 		if node.Type == File {
 			continue

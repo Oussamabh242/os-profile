@@ -22,8 +22,19 @@ run: build
 
 .PHONY: run-wasm
 run-wasm:
-	go run ./bin/web
+	./bin/web
 
 .PHONY: fmt
 fmt:
 	go fmt ./...
+
+
+
+test:
+	@all_pkgs=$$(mktemp); ignored_pkgs=$$(mktemp); filtered_pkgs=$$(mktemp); \
+	go list ./... | sort > $$all_pkgs; \
+	cat .testignore | xargs -n1 go list 2>/dev/null | sort > $$ignored_pkgs; \
+	comm -23 $$all_pkgs $$ignored_pkgs > $$filtered_pkgs; \
+	go test -v $$(cat $$filtered_pkgs); \
+	rm -f $$all_pkgs $$ignored_pkgs $$filtered_pkgs
+
