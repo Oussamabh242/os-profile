@@ -1,9 +1,9 @@
 package main
 
 import (
-	"exmp/bits"
-	"exmp/bits/keyboardevents"
-	"exmp/context"
+	"github.com/Oussamabh242/os-profile/bits"
+	"github.com/Oussamabh242/os-profile/bits/keyboardevents"
+	"github.com/Oussamabh242/os-profile/context"
 	// "syscall/js"
 
 	// "fmt"

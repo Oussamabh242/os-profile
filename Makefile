@@ -14,7 +14,7 @@ build:
 
 .PHONY: build-wasm
 build-wasm:
-	GOOS=js GOARCH=wasm go build -o $(WASM_OUTPUT) main.go
+	GOOS=js GOARCH=wasm go build -o $(WASM_OUTPUT) ./cmd/engine.go
 
 .PHONY: run
 run: build

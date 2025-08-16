@@ -1,7 +1,7 @@
 package keyboardevents
 
 import (
-	"exmp/bits"
+	"github.com/Oussamabh242/os-profile/bits"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"

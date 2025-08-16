@@ -1,8 +1,8 @@
 package bits
 
 import (
-	"exmp/context"
 	"fmt"
+	"github.com/Oussamabh242/os-profile/context"
 	"image/color"
 	"log"
 	"strings"

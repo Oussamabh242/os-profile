@@ -3,8 +3,8 @@ package context
 import (
 	"bytes"
 	_ "embed"
-	"exmp/static"
 	"fmt"
+	"github.com/Oussamabh242/os-profile/static"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"

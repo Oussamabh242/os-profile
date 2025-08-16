@@ -1,4 +1,5 @@
-module exmp
+// module exmp
+module github.com/Oussamabh242/os-profile
 
 go 1.24.5
 
