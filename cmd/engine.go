@@ -4,6 +4,7 @@ import (
 	"github.com/Oussamabh242/os-profile/bits"
 	"github.com/Oussamabh242/os-profile/bits/keyboardevents"
 	"github.com/Oussamabh242/os-profile/context"
+
 	// "syscall/js"
 
 	// "fmt"
@@ -28,6 +29,7 @@ type Game struct {
 	// visibleLines int
 	ScreenText *bits.ScreenText
 	ticks      int
+	Controller uint8 // 0 -> tty , // 1 -> cat cmd
 }
 
 func (g *Game) Update() error {
@@ -40,12 +42,18 @@ func (g *Game) Update() error {
 	// openURL.Invoke("https://example.com")
 	// }
 
-	keyboardevents.KeysGateway(g.ScreenText, kr, context.KeyToChar)
+	keyboardevents.KeysGateway(g.ScreenText, kr, context.KeyToChar, &g.Controller)
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+
+	if g.Controller == 1 {
+
+		bits.Draw(screen)
+		return
+	}
 
 	g.ScreenText.Draw(screen)
 }
@@ -61,6 +69,7 @@ func main() {
 	//Game Instance
 	game := &Game{
 		ScreenText: st,
+		Controller: 0,
 	}
 
 	//startmenu init

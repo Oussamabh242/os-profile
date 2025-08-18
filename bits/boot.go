@@ -123,7 +123,7 @@ func (st *ScreenText) DeleteChar() {
 	st.RecomputeArray()
 }
 
-func (st *ScreenText) Execute() {
+func (st *ScreenText) Execute(controller *uint8) {
 
 	lines := st.ArrayText
 	lastLine := lines[len(lines)-1]
@@ -135,7 +135,7 @@ func (st *ScreenText) Execute() {
 	}
 
 	cmd := lastLine[len(context.PROMPT):]
-	nt := commandsGateway(st, cmd, lines)
+	nt := commandsGateway(st, cmd, lines, controller)
 
 	st.Text = nt + "\n" + context.PROMPT + context.CURSOR
 	st.cleanUp()
@@ -154,7 +154,7 @@ func (st *ScreenText) cleanUp() {
 
 }
 
-func commandsGateway(st *ScreenText, cmd string, lines []string) string {
+func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uint8) string {
 
 	if len(cmd) > 2 && cmd[0:3] == "cd " {
 		newdir := cmd[3:]
@@ -215,13 +215,15 @@ func commandsGateway(st *ScreenText, cmd string, lines []string) string {
 	if cmd == "" {
 		return st.Text
 	}
+
+	if cmd == "cat" {
+		*controller = 1
+		return st.Text
+	}
+
 	if cmd == "exit" {
 		log.Fatal()
 	}
 	return st.Text + "\n" + "bash: " + cmd + " : command not found"
-
-}
-
-func CmdChangeDir(cmd string, stText string) {
 
 }
