@@ -51,7 +51,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	if g.Controller == 1 {
 
-		bits.Draw(screen)
+		bits.DrawBase(screen, context.MD)
 		return
 	}
 

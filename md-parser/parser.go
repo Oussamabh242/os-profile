@@ -38,7 +38,7 @@ func ExistStarter(md string, cur int) string {
 			break
 		}
 
-		matched, _ := regexp.MatchString("^```[a-zA-Z0-9]{2}\n", possibleStarter)
+		matched, _ := regexp.MatchString("^~~~[a-zA-Z0-9]{2}\n", possibleStarter)
 		if matched == true {
 			starter = possibleStarter
 			break
@@ -78,10 +78,13 @@ func ParseNext(markdown string, curr, length int) (TextBlock, int) {
 		}, 2
 	}
 
-	if match, _ := regexp.MatchString("^```[a-zA-Z0-9]{2}\n", starter); match == true {
+	if match, _ := regexp.MatchString("^~~~[a-zA-Z0-9]{2}\n", starter); match == true {
+
+		lang := starter[3:5]
 		return TextBlock{
 			Content: makeCodeBlock(markdown, curr, 6),
 			Type:    CODE,
+			Lang:    lang,
 		}, 9
 
 	}
@@ -132,13 +135,32 @@ func makeCodeBlock(md string, cur, offset int) string {
 	// lookup := md[cur+offset : cur+offset+3]
 	accumulated := []byte{}
 	for i := cur + offset; i < len(md); i++ {
-		accumulated = append(accumulated, md[i])
+
 		if i+3 < len(md) {
-			if md[i:i+3] == "```" {
+			if md[i:i+3] == "~~~" {
 				break
 			}
 		}
+
+		accumulated = append(accumulated, md[i])
 	}
 	return string(accumulated)
 
+}
+
+func (t TextBlock) LangToLogo() string {
+	switch t.Lang {
+	case "go":
+		return ""
+	case "ts":
+		return ""
+	case "py":
+		return ""
+	case "sh":
+		return ""
+	case "rs":
+		return ""
+	default:
+		return ""
+	}
 }

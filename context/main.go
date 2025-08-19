@@ -4,8 +4,9 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
-	"github.com/Oussamabh242/os-profile/static"
 	"log"
+
+	"github.com/Oussamabh242/os-profile/static"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -38,26 +39,41 @@ const CURSOR = "_"
 var BootText string = `
 [    0.000000] Linux version 6.9.4-arch1-1 (linux@archlinux) (gcc (GCC) 13.2.1, GNU ld (GNU Binutils) 2.42) #1 SMP PREEMPT_DYNAMIC
 [    0.000000] Command line: BOOT_IMAGE=/vmlinuz-linux root=/dev/sda2 rw quiet
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
-[    0.000000] x86/fpu: Enabled xstate features 0x1, context size is 0x240 bytes, using 'compacted' format.
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
-...
-[    1.245620] systemd[1]: Detected architecture x86-64.
-[    1.248012] systemd[1]: Hostname set to <archlinux>.
-[    1.455789] systemd[1]: Reached target Local File Systems.
-[    1.478120] systemd[1]: Starting Journal Service...
-[    1.592130] systemd-journald[234]: Journal started
-[    2.005200] systemd[1]: Started Journal Service.
 [    2.118998] systemd[1]: Starting Load Kernel Modules...
 [    2.344765] systemd[1]: Finished Load Kernel Modules.
 [    2.518342] systemd[1]: Starting Login Service...
-[    2.712034] systemd-logind[376]: New seat seat0.
 [    2.752004] systemd[1]: Started Login Service.
-[    3.000123] systemd[1]: Reached target Multi-User System.
-[    3.143003] systemd[1]: Reached target Graphical Interface.
 [    3.200390] systemd[1]: Startup finished in 2.014s (kernel) + 1.825s (userspace) = 3.839s.
 
 Arch Linux  (tty1)
+
+ ▄██████▄  ███    █▄     ▄████████    ▄████████    ▄████████   ▄▄▄▄███▄▄▄▄      ▄████████ 
+███    ███ ███    ███   ███    ███   ███    ███   ███    ███ ▄██▀▀▀███▀▀▀██▄   ███    ███ 
+███    ███ ███    ███   ███    █▀    ███    █▀    ███    ███ ███   ███   ███   ███    ███ 
+███    ███ ███    ███   ███          ███          ███    ███ ███   ███   ███   ███    ███ 
+███    ███ ███    ███ ▀███████████ ▀███████████ ▀███████████ ███   ███   ███ ▀███████████ 
+███    ███ ███    ███          ███          ███   ███    ███ ███   ███   ███   ███    ███ 
+███    ███ ███    ███    ▄█    ███    ▄█    ███   ███    ███ ███   ███   ███   ███    ███ 
+ ▀██████▀  ████████▀   ▄████████▀   ▄████████▀    ███    █▀   ▀█   ███   █▀    ███    █▀  
+                                                                                          
+▀█████████▄     ▄████████ ███▄▄▄▄                                                         
+  ███    ███   ███    ███ ███▀▀▀██▄                                                       
+  ███    ███   ███    █▀  ███   ███                                                       
+ ▄███▄▄▄██▀   ▄███▄▄▄     ███   ███                                                       
+▀▀███▀▀▀██▄  ▀▀███▀▀▀     ███   ███                                                       
+  ███    ██▄   ███    █▄  ███   ███                                                       
+  ███    ███   ███    ███ ███   ███                                                       
+▄█████████▀    ██████████  ▀█   █▀                                                        
+                                                                                          
+   ▄█    █▄       ▄████████    ▄████████    ▄████████    ▄████████ ███▄▄▄▄                
+  ███    ███     ███    ███   ███    ███   ███    ███   ███    ███ ███▀▀▀██▄              
+  ███    ███     ███    ███   ███    █▀    ███    █▀    ███    █▀  ███   ███              
+ ▄███▄▄▄▄███▄▄   ███    ███   ███          ███         ▄███▄▄▄     ███   ███              
+▀▀███▀▀▀▀███▀  ▀███████████ ▀███████████ ▀███████████ ▀▀███▀▀▀     ███   ███              
+  ███    ███     ███    ███          ███          ███   ███    █▄  ███   ███              
+  ███    ███     ███    ███    ▄█    ███    ▄█    ███   ███    ███ ███   ███              
+  ███    █▀      ███    █▀   ▄████████▀   ▄████████▀    ██████████  ▀█   █▀               
+                                                                                         
 
 
 ` + PROMPT
@@ -144,6 +160,7 @@ func init() {
 		log.Fatal(err)
 	}
 	FontIosevkaSource = s
+
 }
 
 const NEOFETCH = `
@@ -169,3 +186,195 @@ const NEOFETCH = `
  .                                   /                           
 
 	`
+
+var MD string = `# header one yes baby
+
+## Introduction 
+
+in this Blog post we are going to make something worth our times, not just doing that 
+one thing in your mind, no we are going beyond that 
+
+### sub-sub-header
+
+* some
+
+~~~ts
+    const x= 10
+~~~
+
+
+~~~go
+func DrawMarkDown(md string, s *ebiten.Image) {
+	startx := 5
+	starty := context.CatStartY
+	parts := mdparser.Parse(md)
+	for _, v := range parts {
+		lineSize := typeToSize(v.Type)
+		splitted := strings.Split(v.Content, "\n")
+		for _, line := range splitted {
+			backlineCount := strings.Count(line, "\n")
+			if backlineCount == 0 {
+				backlineCount = 1
+			}
+			box := ebiten.NewImage(1920, (lineSize+7)*backlineCount)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(startx), float64(starty))
+
+			// Process line while preserving whitespace
+			xOffset := 0
+			charWidth := int(float64(lineSize) * 0.6)
+
+			// Find keyword positions for coloring
+			keywordPositions := make(map[int]bool)
+
+			// Check each keyword in the KEYWORDS slice
+			for _, keyword := range context.KEYWORDS { // Assuming KEYWORDS is accessible via context
+				keywordIndex := 0
+				for {
+					pos := strings.Index(line[keywordIndex:], keyword)
+					if pos == -1 {
+						break
+					}
+					realPos := keywordIndex + pos
+
+					// Check if it's a whole word (not part of another word)
+					isWholeWord := true
+					if realPos > 0 {
+						prevChar := line[realPos-1]
+						if (prevChar >= 'a' && prevChar <= 'z') ||
+							(prevChar >= 'A' && prevChar <= 'Z') ||
+							(prevChar >= '0' && prevChar <= '9') ||
+							prevChar == '_' {
+							isWholeWord = false
+						}
+					}
+					if realPos+len(keyword) < len(line) {
+						nextChar := line[realPos+len(keyword)]
+						if (nextChar >= 'a' && nextChar <= 'z') ||
+							(nextChar >= 'A' && nextChar <= 'Z') ||
+							(nextChar >= '0' && nextChar <= '9') ||
+							nextChar == '_' {
+							isWholeWord = false
+						}
+					}
+
+					if isWholeWord {
+						for i := realPos; i < realPos+len(keyword) && i < len(line); i++ {
+							keywordPositions[i] = true
+						}
+					}
+					keywordIndex = realPos + 1
+				}
+			}
+
+			// Draw character by character
+			for i, char := range line {
+				if char == '\t' {
+					// Handle tab as 4 spaces
+					xOffset += charWidth * 4
+					continue
+				}
+
+				charStr := string(char)
+				textOp := &text.DrawOptions{}
+				textOp.GeoM.Translate(float64(xOffset), 2)
+
+				if keywordPositions[i] && v.Type == mdparser.CODE {
+					textOp.ColorScale.ScaleWithColor(color.RGBA{100, 149, 237, 255})
+				} else {
+					textOp.ColorScale.ScaleWithColor(color.White)
+				}
+
+				text.Draw(box, charStr, &text.GoTextFace{
+					Source: context.FontIosevkaSource,
+					Size:   float64(lineSize),
+				}, textOp)
+
+				xOffset += charWidth
+			}
+
+			s.DrawImage(box, op)
+			starty += (lineSize + 7) * backlineCount
+		}
+	}
+}
+~~~ 
+
+~~~rs
+pub somego = 10;
+~~~
+
+~~~py
+
+for i in range(10) : 
+    print("whatever")
+~~~
+
+# some
+`
+
+var CatStartY = 10
+
+var KEYWORDS []string = []string{
+	// Go Keywords
+	"break", "case", "chan", "const", "continue",
+	"default", "defer", "else", "fallthrough", "for",
+	"func", "go", "goto", "if", "import",
+	"interface", "map", "package", "range", "return",
+	"select", "struct", "switch", "type", "var",
+
+	// Lua Keywords
+	"and", "do", "elseif", "end", "false",
+	"for", "function", "goto", "if", "in",
+	"local", "nil", "not", "or", "repeat",
+	"return", "then", "true", "until", "while",
+	"break", "else",
+
+	// TypeScript Keywords
+	"any", "as", "async", "await", "boolean",
+	"catch", "class", "constructor", "declare", "default",
+	"delete", "enum", "export", "extends", "false",
+	"finally", "from", "function", "get", "if",
+	"implements", "import", "in", "instanceof", "interface",
+	"keyof", "let", "module", "namespace", "never",
+	"new", "null", "number", "private", "protected",
+	"public", "readonly", "require", "return", "set",
+	"static", "string", "super", "switch", "symbol",
+	"this", "throw", "true", "try", "type",
+	"typeof", "undefined", "unknown", "var", "void",
+	"while", "with", "yield",
+
+	// Bash Keywords
+	"!", "do", "done", "elif", "else",
+	"esac", "fi", "for", "function", "if",
+	"in", "select", "then", "time", "until",
+	"while",
+
+	// Coreutils & Common CLI Tools
+	"ls", "cp", "mv", "rm", "mkdir",
+	"rmdir", "touch", "stat", "file", "find",
+	"basename", "dirname",
+
+	"cat", "grep", "sed", "awk", "cut",
+	"sort", "uniq", "tr", "head", "tail",
+	"wc", "xargs", "split", "paste", "tee",
+
+	"chmod", "chown", "chgrp", "umask",
+
+	"top", "ps", "df", "du", "free",
+	"uptime", "vmstat", "iostat", "who", "w",
+
+	// CLI Tools
+	"curl", "wget", "ssh", "scp", "rsync",
+	"tar", "zip", "unzip", "gzip", "bzip2",
+	"jq", "tree", "watch", "less", "more",
+	"htop", "ping", "traceroute",
+
+	"git", "docker", "kubectl", "nmap", "make",
+	"npm", "yarn", "node", "go", "ts-node", "deno",
+	"lua", "cargo", "rustc", "pip", "python",
+
+	// Bonus Bash Tools
+	"fzf", "bat", "exa", "fd", "rg",
+	"tldr", "ncdu", "btop", "lsd", "httpie",
+}

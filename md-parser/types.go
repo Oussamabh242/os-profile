@@ -20,6 +20,7 @@ const (
 type TextBlock struct {
 	Type    BlockType
 	Content string
+	Lang    string
 }
 
 func NewText(xtype BlockType, content string) TextBlock {

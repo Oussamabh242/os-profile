@@ -12,7 +12,7 @@ func main() {
 	// Redirect / to /main.html
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
-			http.ServeFile(w, r, "./web/main.html")
+			http.ServeFile(w, r, "./web/index.html")
 			return
 		}
 		fs.ServeHTTP(w, r)
