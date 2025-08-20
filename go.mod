@@ -1,7 +1,7 @@
 // module exmp
 module github.com/Oussamabh242/os-profile
 
-go 1.24.5
+go 1.24
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
