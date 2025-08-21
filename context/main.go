@@ -2,8 +2,8 @@ package context
 
 import (
 	"bytes"
-	_ "embed"
 	"fmt"
+	"io/fs"
 	"log"
 
 	"github.com/Oussamabh242/os-profile/static"
@@ -131,6 +131,7 @@ var KeyToChar = map[ebiten.Key]string{
 	ebiten.KeyY:     "y",
 	ebiten.KeyZ:     "z",
 	ebiten.KeySpace: " ",
+	ebiten.KeyMinus: "-",
 	// ebiten.KeyEnter: "\n",
 	ebiten.Key0: "0",
 	ebiten.Key1: "1",
@@ -148,12 +149,33 @@ var KeyToChar = map[ebiten.Key]string{
 
 func init() {
 
-	Head.MakeNode("CV", Dir)
-	Blog := Head.MakeNode("Blog", Dir)
-	Head.MakeNode("contact.md", File)
-	Blog.MakeNode("first.md", File)
-	Blog.MakeNode("second.md", File)
-	Blog.MakeNode("Some", Dir)
+	Head.MakeNode("CV", Dir, nil)
+	Blog := Head.MakeNode("Blog", Dir, nil)
+
+	// SEARCH static/posts for blog posts
+	files, _ := fs.ReadDir(static.PostsFS, "posts")
+	// entries, err := os.ReadDir("static/posts")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+
+	fmt.Println(files)
+	for _, v := range files {
+
+		if !v.IsDir() {
+
+			filepath := "posts/" + v.Name()
+
+			Blog.MakeNode(v.Name(), File, &filepath)
+		}
+	}
+
+	// }
+
+	Head.MakeNode("contact.md", File, nil)
+	Blog.MakeNode("first.md", File, nil)
+	Blog.MakeNode("second.md", File, nil)
+	Blog.MakeNode("Some", Dir, nil)
 
 	s, err := text.NewGoTextFaceSource(bytes.NewReader(static.IosevkaTTF))
 	if err != nil {

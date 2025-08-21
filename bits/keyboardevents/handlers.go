@@ -11,7 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func KeysGateway(st *bits.ScreenText, kr *KeyRepeat, charMap map[ebiten.Key]string, controller *uint8) {
+func KeysGateway(st *bits.ScreenText, kr *KeyRepeat, charMap map[ebiten.Key]string, controller *uint8, fileHoldingControl *string) {
 	shiftHeld := ebiten.IsKeyPressed(ebiten.KeyShift) ||
 		ebiten.IsKeyPressed(ebiten.KeyShiftLeft) ||
 		ebiten.IsKeyPressed(ebiten.KeyShiftRight)
@@ -54,6 +54,6 @@ func KeysGateway(st *bits.ScreenText, kr *KeyRepeat, charMap map[ebiten.Key]stri
 		st.DeleteChar()
 	}
 	if kr.IsRepeat(ebiten.KeyEnter) {
-		st.Execute(controller)
+		st.Execute(controller, fileHoldingControl)
 	}
 }

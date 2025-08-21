@@ -1,18 +1,17 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Oussamabh242/os-profile/bits"
 	"github.com/Oussamabh242/os-profile/bits/keyboardevents"
 	"github.com/Oussamabh242/os-profile/context"
+	"github.com/Oussamabh242/os-profile/static"
 
-	// "syscall/js"
-
-	// "fmt"
 	"log"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	// "github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // var openURL = js.Global().Get("openURL")
@@ -27,9 +26,10 @@ const (
 
 type Game struct {
 	// visibleLines int
-	ScreenText *bits.ScreenText
-	ticks      int
-	Controller uint8 // 0 -> tty , // 1 -> cat cmd
+	ScreenText         *bits.ScreenText
+	ticks              int
+	Controller         uint8  // 0 -> tty , // 1 -> cat cmd
+	FileHoldingControl string // 0 -> tty , // 1 -> cat cmd
 }
 
 func (g *Game) Update() error {
@@ -42,7 +42,10 @@ func (g *Game) Update() error {
 	// openURL.Invoke("https://example.com")
 	// }
 
-	keyboardevents.KeysGateway(g.ScreenText, kr, context.KeyToChar, &g.Controller)
+	keyboardevents.KeysGateway(g.ScreenText, kr, context.KeyToChar, &g.Controller, &g.FileHoldingControl)
+	if g.Controller == 1 {
+		fmt.Printf("fileHoldingControl :%v\n", g.FileHoldingControl)
+	}
 
 	return nil
 }
@@ -50,8 +53,13 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 
 	if g.Controller == 1 {
+		data, err := static.PostsFS.ReadFile(g.FileHoldingControl)
+		if err != nil {
+			fmt.Println(err)
+			g.Controller = 0
+		}
 
-		bits.DrawBase(screen, context.MD)
+		bits.DrawBase(screen, string(data))
 		return
 	}
 

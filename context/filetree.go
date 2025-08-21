@@ -13,6 +13,7 @@ type Node struct {
 	Children []*Node
 	IsRoot   bool
 	Parent   *Node
+	FilePath string
 }
 
 // type WhereAmI struct {
@@ -28,7 +29,7 @@ func MakeFileTree() *Node {
 	}
 }
 
-func (n *Node) MakeNode(name string, nodeType Filetype) *Node {
+func (n *Node) MakeNode(name string, nodeType Filetype, filePath *string) *Node {
 
 	newNode := &Node{
 		Name:     name,
@@ -36,6 +37,9 @@ func (n *Node) MakeNode(name string, nodeType Filetype) *Node {
 		Children: []*Node{},
 		IsRoot:   false,
 		Parent:   n,
+	}
+	if filePath != nil {
+		newNode.FilePath = *filePath
 	}
 
 	n.Children = append(n.Children, newNode)

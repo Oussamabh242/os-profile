@@ -1,10 +1,12 @@
 package bits
 
 import (
-	"github.com/Oussamabh242/os-profile/context"
+	"fmt"
 	"image/color"
 	"log"
 	"strings"
+
+	"github.com/Oussamabh242/os-profile/context"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -123,7 +125,7 @@ func (st *ScreenText) DeleteChar() {
 	st.RecomputeArray()
 }
 
-func (st *ScreenText) Execute(controller *uint8) {
+func (st *ScreenText) Execute(controller *uint8, fileHoldingControl *string) {
 
 	lines := st.ArrayText
 	lastLine := lines[len(lines)-1]
@@ -135,7 +137,8 @@ func (st *ScreenText) Execute(controller *uint8) {
 	}
 
 	cmd := lastLine[len(context.PROMPT):]
-	nt := commandsGateway(st, cmd, lines, controller)
+	fmt.Println(cmd)
+	nt := commandsGateway(st, cmd, lines, controller, fileHoldingControl)
 
 	st.Text = nt + "\n" + context.PROMPT + context.CURSOR
 	st.cleanUp()
@@ -154,7 +157,28 @@ func (st *ScreenText) cleanUp() {
 
 }
 
-func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uint8) string {
+func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uint8,
+	fileHoldingControl *string) string {
+
+	splitted := strings.Split(cmd, " ")
+
+	if len(splitted) == 2 && splitted[0] == "cat" {
+		fileName := splitted[1]
+		// filesInCurrentDir := context.Head.Ls()
+		exists := context.Node{}
+		for _, v := range context.Head.Children {
+			if v.Type == context.File && v.Name == fileName {
+				exists = *v
+				break
+			}
+		}
+		if exists.Name == "" {
+			return st.Text + "\n" + "File : " + fileName + " does not exists in the current directory" + "\n"
+		}
+		*controller = 1
+		*fileHoldingControl = exists.FilePath
+		return st.Text
+	}
 
 	if len(cmd) > 2 && cmd[0:3] == "cd " {
 		newdir := cmd[3:]
@@ -165,6 +189,7 @@ func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uin
 		} else {
 			context.Head = newHead
 			context.UpdateDir(context.Pwd(context.Head))
+
 		}
 
 		// if newdir == ".." || newdir == "../" {
@@ -216,10 +241,10 @@ func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uin
 		return st.Text
 	}
 
-	if cmd == "cat" {
-		*controller = 1
-		return st.Text
-	}
+	// if cmd == "cat" {
+	// 	*controller = 1
+	// 	return st.Text
+	// }
 
 	if cmd == "exit" {
 		log.Fatal()
