@@ -1,6 +1,7 @@
 package bits
 
 import (
+	"encoding/json"
 	"fmt"
 	"image/color"
 	"log"
@@ -162,6 +163,32 @@ func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uin
 
 	splitted := strings.Split(cmd, " ")
 
+	if len(splitted) == 2 && splitted[0] == "srch" && context.Head.Name == "Blog" {
+		contains := splitted[1]
+		str := context.MakeOutsideReqeust("/posts?search=" + contains)
+
+		var ret context.ListPostsReq
+		json.Unmarshal([]byte(str), &ret)
+
+		if len(ret.Posts) == 0 {
+			return st.Text + "\n" + "srch: " + contains + " : no file matching this pattern found! "
+		}
+
+		matchs := ""
+		mxcols := 5
+
+		for _, v := range ret.Posts {
+			if mxcols == 0 {
+				mxcols = 5
+				matchs += "\n"
+			}
+			matchs += v + "        "
+			mxcols--
+		}
+		return st.Text + "\n" + matchs
+
+	}
+
 	if len(splitted) == 2 && splitted[0] == "cat" {
 		fileName := splitted[1]
 		// filesInCurrentDir := context.Head.Ls()
@@ -176,7 +203,7 @@ func commandsGateway(st *ScreenText, cmd string, lines []string, controller *uin
 			return st.Text + "\n" + "File : " + fileName + " does not exists in the current directory" + "\n"
 		}
 		*controller = 1
-		*fileHoldingControl = exists.FilePath
+		*fileHoldingControl = exists.Name
 		return st.Text
 	}
 

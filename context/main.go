@@ -2,8 +2,8 @@ package context
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"io/fs"
 	"log"
 
 	"github.com/Oussamabh242/os-profile/static"
@@ -147,30 +147,45 @@ var KeyToChar = map[ebiten.Key]string{
 	ebiten.KeyPeriod: ".",
 }
 
+type ListPostsReq struct {
+	Posts []string `json:"posts"`
+}
+
 func init() {
+
+	stringData := MakeOutsideReqeust("/posts")
+
+	var ret ListPostsReq
+	json.Unmarshal([]byte(stringData), &ret)
+	fmt.Println("ret", ret)
 
 	Head.MakeNode("CV", Dir, nil)
 	Blog := Head.MakeNode("Blog", Dir, nil)
 
 	// SEARCH static/posts for blog posts
-	files, _ := fs.ReadDir(static.PostsFS, "posts")
+	// files, _ := fs.ReadDir(static.PostsFS, "posts")
 	// entries, err := os.ReadDir("static/posts")
 	// if err != nil {
 	// 	fmt.Println(err)
 	// } else {
 
-	fmt.Println(files)
-	for _, v := range files {
-
-		if !v.IsDir() {
-
-			filepath := "posts/" + v.Name()
-
-			Blog.MakeNode(v.Name(), File, &filepath)
-		}
-	}
+	// fmt.Println(files)
+	// for _, v := range files {
+	//
+	// 	if !v.IsDir() {
+	//
+	// 		filepath := "posts/" + v.Name()
+	//
+	// 		Blog.MakeNode(v.Name(), File, &filepath)
+	// 	}
+	// }
 
 	// }
+
+	for _, v := range ret.Posts {
+		Blog.MakeNode(v, File, nil)
+
+	}
 
 	Head.MakeNode("contact.md", File, nil)
 	Blog.MakeNode("first.md", File, nil)

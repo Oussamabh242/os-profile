@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/Oussamabh242/os-profile/bits"
 	"github.com/Oussamabh242/os-profile/bits/keyboardevents"
 	"github.com/Oussamabh242/os-profile/context"
-	"github.com/Oussamabh242/os-profile/static"
 
 	"log"
 	"time"
@@ -15,6 +14,8 @@ import (
 )
 
 // var openURL = js.Global().Get("openURL")
+
+var MdCache map[string]string = make(map[string]string)
 
 var lastUpdate time.Time
 var kr = keyboardevents.NewKeyRepeat()
@@ -28,8 +29,8 @@ type Game struct {
 	// visibleLines int
 	ScreenText         *bits.ScreenText
 	ticks              int
-	Controller         uint8  // 0 -> tty , // 1 -> cat cmd
-	FileHoldingControl string // 0 -> tty , // 1 -> cat cmd
+	Controller         uint8 // 0 -> tty , // 1 -> cat cmd
+	FileHoldingControl string
 }
 
 func (g *Game) Update() error {
@@ -43,23 +44,31 @@ func (g *Game) Update() error {
 	// }
 
 	keyboardevents.KeysGateway(g.ScreenText, kr, context.KeyToChar, &g.Controller, &g.FileHoldingControl)
-	if g.Controller == 1 {
-		fmt.Printf("fileHoldingControl :%v\n", g.FileHoldingControl)
-	}
-
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
 	if g.Controller == 1 {
-		data, err := static.PostsFS.ReadFile(g.FileHoldingControl)
-		if err != nil {
-			fmt.Println(err)
+		// data, err := static.PostsFS.ReadFile(g.FileHoldingControl)
+		splitted := strings.Split(g.FileHoldingControl, ".")
+		if len(splitted) != 2 {
+			log.Println("oops cannot splitt perfectly")
 			g.Controller = 0
 		}
+		v, exists := MdCache[splitted[0]]
+		if !exists {
+			str := context.MakeOutsideReqeust("/posts/" + splitted[0])
+			if str == "" {
+				log.Println("returned emptyFile")
+				g.Controller = 0
+			}
 
-		bits.DrawBase(screen, string(data))
+			MdCache[splitted[0]] = str
+		}
+
+		bits.DrawBase(screen, v)
+
 		return
 	}
 
@@ -79,6 +88,7 @@ func main() {
 		ScreenText: st,
 		Controller: 0,
 	}
+	// rant-on-typescript.
 
 	//startmenu init
 
@@ -91,3 +101,5 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+//// WASM

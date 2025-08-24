@@ -21,12 +21,18 @@ run: build
 	./$(BIN_DIR)/$(BINARY_NAME)
 
 .PHONY: run-wasm
-run-wasm:
+run-wasm: build-wasm
 	./bin/web
 
 .PHONY: fmt
 fmt:
 	go fmt ./...
+
+.PHONY: build-web
+build-web:
+	go build -o ./bin/web ./cmd/web.go
+
+web: build-web run-wasm
 
 
 
