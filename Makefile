@@ -15,6 +15,7 @@ build:
 .PHONY: build-wasm
 build-wasm:
 	GOOS=js GOARCH=wasm go build -o $(WASM_OUTPUT) ./cmd/engine.go
+	gzip -k -9 web/main.wasm
 
 .PHONY: run
 run: build

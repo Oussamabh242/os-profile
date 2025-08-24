@@ -13,6 +13,13 @@ func main() {
 
 	fs := http.FileServer(http.Dir("./web"))
 
+	http.HandleFunc("GET /main.wasm", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Content-Type", "application/wasm")
+
+		http.ServeFile(w, r, "./web/main.wasm.gz")
+	})
+
 	// INDEX
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
